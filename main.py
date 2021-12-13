@@ -5,17 +5,17 @@ def get_total_effectiveness(effectiveness_list: list[float]) -> float:
     return 1 - total
 
 
-def get_cumulative_p_of_failure(effectiveness_list: list[float], recurrences: int) -> float:
-    e_total = get_total_effectiveness(effectiveness_list)
+def get_cumulative_p_of_failure(e_total: float, recurrences: int) -> float:
     return 1 - e_total**recurrences
 
 
 def main():
     effs = [float(p) for p in input("Effectiveness list> ").split()]
+    e_total = get_total_effectiveness(effs)
 
     while True:
         n = int(input("Number of occurrences> "))
-        result = get_cumulative_p_of_failure(list(effs), n)
+        result = get_cumulative_p_of_failure(e_total, n)
         print(f"{result:.2%}")
 
 
