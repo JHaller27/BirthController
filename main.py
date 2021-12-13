@@ -1,3 +1,7 @@
+import matplotlib.pyplot as plt
+import matplotlib.ticker as m_tick
+
+
 def get_total_effectiveness(effectiveness_list: list[float]) -> float:
     total = 1
     for e in effectiveness_list:
@@ -10,13 +14,21 @@ def get_cumulative_p_of_failure(e_total: float, recurrences: int) -> float:
 
 
 def main():
-    effs = [float(p) for p in input("Effectiveness list> ").split()]
+    effs = [0.99, 0.84]
     e_total = get_total_effectiveness(effs)
 
-    while True:
-        n = int(input("Number of occurrences> "))
-        result = get_cumulative_p_of_failure(e_total, n)
-        print(f"{result:.2%}")
+    cumulative_p_list = [get_cumulative_p_of_failure(e_total, n) for n in range(50+1)]
+
+    ax = plt.axes()
+
+    ax.plot(cumulative_p_list)
+
+    ax.grid(visible=True, which='major', linestyle='-')
+    ax.grid(visible=True, which='minor', axis='x', linestyle=':')
+    ax.minorticks_on()
+    ax.yaxis.set_major_formatter(m_tick.PercentFormatter(xmax=1))
+
+    plt.show()
 
 
 if __name__ == '__main__':
