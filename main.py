@@ -68,9 +68,11 @@ class MyPlot:
 
     def _setup_axes(self, ax: plt.Axes) -> None:
         ax.set_xscale('log')
+        ax.set_yscale('log')
 
         ax.grid(visible=True, which='major', linestyle='-')
         ax.grid(visible=True, which='minor', axis='x', linestyle=':')
+        ax.grid(visible=True, which='minor', axis='y', linestyle=':')
         ax.minorticks_on()
         ax.yaxis.set_major_formatter(m_tick.PercentFormatter(xmax=1))
         ax.xaxis.set_major_formatter(m_tick.FuncFormatter("{:,.0f}".format))
@@ -81,9 +83,11 @@ class MyPlot:
     def show(self) -> None:
         max_n = 100_000
 
-        for idx, scenario in enumerate(self._scenarios):
-            ax: plt.Axes = plt.subplot(len(self._scenarios), 1, idx+1)
+        fig, axes = plt.subplots(nrows=len(self._scenarios))
+        fig: plt.Figure
+        fig.tight_layout(pad=3.0)
 
+        for ax, scenario in zip(axes, self._scenarios):
             self._setup_axes(ax)
             ax.set_xlim(right=max_n)
             ax.set_title(scenario.name)
