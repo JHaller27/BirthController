@@ -19,10 +19,11 @@ def main():
 
     cumulative_p_list = [get_cumulative_p_of_failure(e_total, n) for n in range(50+1)]
 
-    ax = plt.axes()
+    ax: plt.Axes = plt.axes()
 
     ax.plot(cumulative_p_list)
 
+    ax.set_title("Probability of Pregnancy")
     ax.grid(visible=True, which='major', linestyle='-')
     ax.grid(visible=True, which='minor', axis='x', linestyle=':')
     ax.minorticks_on()
