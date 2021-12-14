@@ -100,18 +100,28 @@ class MyPlot:
 
 
 def main():
-    scenario1 = Scenario("Scenario 1")
-    scenario1.add_method(Method(0.91))
-    scenario1.add_method(Method(0.85))
-    scenario1.add_method(Method(0.76))
+    scenarios: list[Scenario] = []
 
-    scenario2 = Scenario("Scenario 2")
-    scenario2.add_method(Method(0.99))
-    scenario2.add_method(Method(0.91))
-    scenario2.add_method(Method(0.85))
-    scenario2.add_method(Method(0.76))
+    scenarios.append(Scenario("Scenario 1"))
+    scenarios[-1].add_method(Method(0.78))
+    scenarios[-1].add_method(Method(0.91))
+    scenarios[-1].add_method(Method(0.85))
+    scenarios[-1].add_method(Method(0.76))
 
-    plot = MyPlot([scenario1, scenario2])
+    scenarios.append(Scenario("Scenario 2"))
+    scenarios[-1].add_method(Method(0.99))
+    scenarios[-1].add_method(Method(0.78))
+    scenarios[-1].add_method(Method(0.91))
+    scenarios[-1].add_method(Method(0.76))
+
+    scenarios.append(Scenario("Scenario 3"))
+    scenarios[-1].add_method(Method(0.99))
+    scenarios[-1].add_method(Method(0.78))
+    scenarios[-1].add_method(Method(0.91))
+    scenarios[-1].add_method(Method(0.85))
+    scenarios[-1].add_method(Method(0.76))
+
+    plot = MyPlot(scenarios)
     plot.show()
 
 
