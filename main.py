@@ -1,7 +1,8 @@
 import matplotlib.pyplot as plt
 import matplotlib.ticker as m_tick
+import math
 from functools import cached_property
-from typing import Optional, Iterator
+from typing import Optional, Iterator, Iterable
 
 
 class Method:
@@ -46,12 +47,12 @@ class Scenario:
 
         return self._effectiveness ** n
 
-    def p_failure(self, recurrences: int = 1) -> float:
-        return 1 - self.effectiveness(recurrences)
+    def n_for_threshold(self, threshold: float) -> float:
+        return math.log(1 - threshold, self.effectiveness())
 
-    def p_failure_list(self, *, min_times: int = 0, max_times: int) -> Iterator:
-        for n in range(min_times, max_times + 1):
-            yield self.p_failure(n)
+    def n_list(self, thresholds: Iterable[float]) -> Iterator[float]:
+        for t in thresholds:
+            yield self.n_for_threshold(t)
 
 
 class MyPlot:
@@ -60,25 +61,39 @@ class MyPlot:
     def __init__(self, scenarios: Iterator[Scenario]):
         self._scenarios = list(scenarios)
 
+    @cached_property
+    def _steps(self, *, min_threshold: float = 0.0, max_threshold: float = 1.0, step_size: float = 0.01) -> list[float]:
+        steps = [min_threshold + step_size * mult for mult in range(math.ceil((max_threshold - min_threshold) / step_size))]
+        return steps
+
     def _setup_axes(self, ax: plt.Axes) -> None:
-        ax.set_ylim(top=0.1)
+        ax.set_xscale('log')
 
         ax.grid(visible=True, which='major', linestyle='-')
         ax.grid(visible=True, which='minor', axis='x', linestyle=':')
         ax.minorticks_on()
         ax.yaxis.set_major_formatter(m_tick.PercentFormatter(xmax=1))
 
-    def show(self, window: tuple[int, int] = (0, 50)) -> None:
-        for idx, scenario in enumerate(self._scenarios):
-            ax: plt.Axes = plt.subplot(len(self._scenarios), 1, idx+1)
+        ax.set_xlabel("Times having sex")
+        ax.set_ylabel("Chance of pregnancy")
+
+    def show(self) -> None:
+        max_n = 0
+        curve_tuples: list[tuple[str, list[float]]] = []
+        for scenario in self._scenarios:
+            n_list = list(scenario.n_list(self._steps))
+            max_n = max(max_n, n_list[-1])
+
+            curve_tuples.append((scenario.name, n_list))
+
+        for idx, (name, n_list) in enumerate(curve_tuples):
+            ax: plt.Axes = plt.subplot(len(curve_tuples), 1, idx+1)
 
             self._setup_axes(ax)
-            ax.set_title(scenario.name)
+            ax.set_xlim(right=max_n)
+            ax.set_title(name)
 
-            cumulative_p_list = list(scenario.p_failure_list(min_times=window[0], max_times=window[1]))
-            ax.plot(cumulative_p_list, label=scenario.name)
-
-            ax.legend()
+            ax.plot(n_list, self._steps, label=name)
 
         plt.suptitle("Probability of Pregnancy")
         plt.show()
