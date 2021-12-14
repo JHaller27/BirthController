@@ -97,13 +97,15 @@ class MyPlot:
 
 def main():
     scenario1 = Scenario("Scenario 1")
-    scenario1.add_method(Method(0.99))
-    scenario1.add_method(Method(0.84))
+    scenario1.add_method(Method(0.91))
+    scenario1.add_method(Method(0.85))
+    scenario1.add_method(Method(0.76))
 
     scenario2 = Scenario("Scenario 2")
     scenario2.add_method(Method(0.99))
-    scenario2.add_method(Method(0.84))
     scenario2.add_method(Method(0.91))
+    scenario2.add_method(Method(0.85))
+    scenario2.add_method(Method(0.76))
 
     plot = MyPlot([scenario1, scenario2])
     plot.show()
