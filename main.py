@@ -73,27 +73,23 @@ class MyPlot:
         ax.grid(visible=True, which='minor', axis='x', linestyle=':')
         ax.minorticks_on()
         ax.yaxis.set_major_formatter(m_tick.PercentFormatter(xmax=1))
+        ax.xaxis.set_major_formatter(m_tick.FuncFormatter("{:,.0f}".format))
 
         ax.set_xlabel("Times having sex")
         ax.set_ylabel("Chance of pregnancy")
 
     def show(self) -> None:
-        max_n = 0
-        curve_tuples: list[tuple[str, list[float]]] = []
-        for scenario in self._scenarios:
-            n_list = list(scenario.n_list(self._steps))
-            max_n = max(max_n, n_list[-1])
+        max_n = 100_000
 
-            curve_tuples.append((scenario.name, n_list))
-
-        for idx, (name, n_list) in enumerate(curve_tuples):
-            ax: plt.Axes = plt.subplot(len(curve_tuples), 1, idx+1)
+        for idx, scenario in enumerate(self._scenarios):
+            ax: plt.Axes = plt.subplot(len(self._scenarios), 1, idx+1)
 
             self._setup_axes(ax)
             ax.set_xlim(right=max_n)
-            ax.set_title(name)
+            ax.set_title(scenario.name)
 
-            ax.plot(n_list, self._steps, label=name)
+            n_list = list(scenario.n_list(self._steps))
+            ax.plot(n_list, self._steps, label=scenario.name)
 
         plt.suptitle("Probability of Pregnancy")
         plt.show()
