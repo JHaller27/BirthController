@@ -21,12 +21,18 @@ class Method:
 
 
 class Scenario:
+    _name: str
     _methods: list[Method]
     _effectiveness: Optional[float]
 
-    def __init__(self):
+    def __init__(self, name: str):
+        self._name = name
         self._methods = list()
         self._effectiveness = None
+
+    @property
+    def name(self) -> str:
+        return self._name
 
     def add_method(self, method: Method) -> None:
         self._methods.append(method)
@@ -49,39 +55,46 @@ class Scenario:
 
 
 class MyPlot:
-    _ax: plt.Axes
+    _scenarios: list[Scenario]
 
-    def __init__(self):
-        self._ax = plt.axes()
+    def __init__(self, scenarios: Iterator[Scenario]):
+        self._scenarios = list(scenarios)
 
-        self._ax.set_title("Probability of Pregnancy")
-        self._ax.grid(visible=True, which='major', linestyle='-')
-        self._ax.grid(visible=True, which='minor', axis='x', linestyle=':')
-        self._ax.minorticks_on()
-        self._ax.yaxis.set_major_formatter(m_tick.PercentFormatter(xmax=1))
+    def _setup_axes(self, ax: plt.Axes) -> None:
+        ax.set_ylim(top=0.1)
 
-    def add_scenario(self, scenario: Scenario, window: tuple[int, int] = (0, 50)) -> None:
-        cumulative_p_list = list(scenario.p_failure_list(min_times=window[0], max_times=window[1]))
-        self._ax.plot(cumulative_p_list)
+        ax.grid(visible=True, which='major', linestyle='-')
+        ax.grid(visible=True, which='minor', axis='x', linestyle=':')
+        ax.minorticks_on()
+        ax.yaxis.set_major_formatter(m_tick.PercentFormatter(xmax=1))
 
-    def show(self) -> None:
+    def show(self, window: tuple[int, int] = (0, 50)) -> None:
+        for idx, scenario in enumerate(self._scenarios):
+            ax: plt.Axes = plt.subplot(len(self._scenarios), 1, idx+1)
+
+            self._setup_axes(ax)
+            ax.set_title(scenario.name)
+
+            cumulative_p_list = list(scenario.p_failure_list(min_times=window[0], max_times=window[1]))
+            ax.plot(cumulative_p_list, label=scenario.name)
+
+            ax.legend()
+
+        plt.suptitle("Probability of Pregnancy")
         plt.show()
 
 
 def main():
-    plot = MyPlot()
+    scenario1 = Scenario("Scenario 1")
+    scenario1.add_method(Method(0.99))
+    scenario1.add_method(Method(0.84))
 
-    scenario = Scenario()
-    scenario.add_method(Method(0.99))
-    scenario.add_method(Method(0.84))
-    plot.add_scenario(scenario)
+    scenario2 = Scenario("Scenario 2")
+    scenario2.add_method(Method(0.99))
+    scenario2.add_method(Method(0.84))
+    scenario2.add_method(Method(0.91))
 
-    scenario = Scenario()
-    scenario.add_method(Method(0.99))
-    scenario.add_method(Method(0.84))
-    scenario.add_method(Method(0.91))
-    plot.add_scenario(scenario)
-
+    plot = MyPlot([scenario1, scenario2])
     plot.show()
 
 
