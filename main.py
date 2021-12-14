@@ -72,11 +72,16 @@ def main():
     plot = MyPlot()
 
     scenario = Scenario()
-
     scenario.add_method(Method(0.99))
     scenario.add_method(Method(0.84))
-
     plot.add_scenario(scenario)
+
+    scenario = Scenario()
+    scenario.add_method(Method(0.99))
+    scenario.add_method(Method(0.84))
+    scenario.add_method(Method(0.91))
+    plot.add_scenario(scenario)
+
     plot.show()
 
 
